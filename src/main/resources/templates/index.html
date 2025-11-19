@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Admisión Universitaria UDA</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Line Awesome Icons -->
+    <link rel="stylesheet"
+        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+
+    <!-- Google Fonts - Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #3b6a75;
+            --secondary-color: #f7b900;
+            --background-color: #f3f2ed;
+            --background-footer: #1c2a44;
+        }
+
+        * {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: var(--primary-color) !important;
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand i {
+            color: var(--secondary-color);
+            margin-right: 10px;
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--secondary-color) !important;
+        }
+
+        /* Banner/Jumbotron Styles 
+        .banner-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4a6573 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }*/
+
+        .banner-section {
+            background: url("/images/bg-calendario.jpg") center/cover no-repeat;
+            color: black;
+            padding: 80px 0;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        ._banner-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23DBCA11" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,149.3C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .banner-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .banner-section p {
+            font-size: 1.3rem;
+            margin-bottom: 0;
+        }
+
+        /* Steps Navigation */
+        .steps-container {
+            margin-bottom: 40px;
+        }
+
+        .step-item {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .step-item.active .step-number {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        .form-label {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #ddd;
+            padding: 12px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(219, 202, 17, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2a3d47;
+            border-color: #2a3d47;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(54, 76, 89, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 15px 40px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .btn-success:hover {
+            background-color: #c4b510;
+            border-color: #c4b510;
+            color: var(--primary-color);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: var(--background-footer);
+            color: white;
+            padding: 50px 0 30px;
+            margin-top: 80px;
+        }
+
+        .footer h5 {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .footer a:hover {
+            color: var(--secondary-color);
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            transition: color 0.3s;
+        }
+
+        .social-icons a:hover {
+            color: var(--secondary-color);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 30px;
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        /* Input Group Styles */
+        .input-group-rut {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 10px;
+        }
+
+        .input-group-phone {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+        }
+
+        /* Terms Modal */
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .modal-title {
+            font-weight: 700;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .navbar-logo {
+            max-height: 50px;
+            width: auto;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="https://uda.cl/wp-content/uploads/2020/01/logo-corp-letrablanca300dpi-300x101.png"
+                    alt="Universidad" class="navbar-logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#inicio">
+                            <i class="las la-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://uda.cl">
+                            <i class="las la-university"></i> Universidad
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://admision.uda.cl">
+                            <i class="las la-envelope"></i> Admisión
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Banner Section -->
+    <section class="banner-section" id="inicio">
+        <div class="container">
+            <div class="row banner-content">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1><i class="las la-calculator"></i> Simulador de Admisión</h1>
+                    <p>Descubre tus posibilidades de ingreso a nuestra universidad</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+
+        <!-- Steps Navigation -->
+        <div class="steps-container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="step-item active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Ingresa tus datos</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step-item" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Ingresa tus puntajes</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step-item" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Conoce tus resultados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <form id="simuladorForm">
+
+                <!-- Section 1: Datos Personales -->
+                <div class="form-section active" id="section1">
+                    <h2 class="section-title">
+                        <i class="las la-user"></i> Ingresa tus datos
+                    </h2>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="rut" class="form-label">RUT <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="rut" placeholder="12345678" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dv" class="form-label">Dígito Verificador <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="dv" placeholder="K" maxlength="1" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" placeholder="correo@ejemplo.com" required>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nombre" placeholder="Nombre" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellidos" class="form-label">Apellidos <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="apellidos" placeholder="Apellidos" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="codigoArea" class="form-label">Código de Área</label>
+                            <input type="text" class="form-control" id="codigoArea" placeholder="+56">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="telefono" placeholder="2 1234 5678">
+                        </div>
+                        <div class="col-md-5">
+                            <label for="movil" class="form-label">Móvil <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="movil" placeholder="9 1234 5678" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="anioEgreso" class="form-label">Año de Egreso <span
+                                class="text-danger">*</span></label>
+                        <select class="form-select" id="anioEgreso" required>
+                            <option value="">Selecciona el año</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2016">2016 o anterior</option>
+                        </select>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="button" class="btn btn-primary" onclick="nextSection(2)">
+                            Siguiente <i class="las la-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 2: Puntajes -->
+                <div class="form-section" id="section2">
+                    <h2 class="section-title">
+                        <i class="las la-chart-bar"></i> Ingresa tus puntajes
+                    </h2>
+
+                    <div class="mb-3">
+                        <label for="carrera" class="form-label">Selecciona Carrera <span
+                                class="text-danger">*</span></label>
+                        <select class="form-select" id="carrera" required>
+                            <option value="">Selecciona una carrera</option>
+                            <option value="ingenieria-civil">Ingeniería Civil</option>
+                            <option value="medicina">Medicina</option>
+                            <option value="derecho">Derecho</option>
+                            <option value="psicologia">Psicología</option>
+                            <option value="arquitectura">Arquitectura</option>
+                            <option value="enfermeria">Enfermería</option>
+                            <option value="pedagogia">Pedagogía</option>
+                            <option value="contador-auditor">Contador Auditor</option>
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="puntajeMat" class="form-label">Puntaje Matemáticas <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="puntajeMat" placeholder="150 - 1000" min="150"
+                                max="1000" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="competenciaMat" class="form-label">Competencia Matemática <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="competenciaMat" placeholder="150 - 1000"
+                                min="150" max="1000" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nem" class="form-label">NEM <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="nem" placeholder="150 - 1000" min="150"
+                                max="1000" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="lenguaje" class="form-label">Lenguaje <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="lenguaje" placeholder="150 - 1000" min="150"
+                                max="1000" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="ciencias" class="form-label">Ciencias</label>
+                            <input type="number" class="form-control" id="ciencias" placeholder="150 - 1000" min="150"
+                                max="1000">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ranking" class="form-label">Ranking <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="ranking" placeholder="150 - 1000" min="150"
+                                max="1000" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="historia" class="form-label">Historia y Ciencias Sociales</label>
+                        <input type="number" class="form-control" id="historia" placeholder="150 - 1000" min="150"
+                            max="1000">
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terminos" required>
+                            <label class="form-check-label" for="terminos">
+                                Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#terminosModal">términos y
+                                    condiciones</a> <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" onclick="prevSection(1)">
+                            <i class="las la-arrow-left"></i> Anterior
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="las la-calculator"></i> Simular
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 3: Resultados -->
+                <div class="form-section" id="section3">
+                    <h2 class="section-title">
+                        <i class="las la-check-circle"></i> Conoce tus resultados
+                    </h2>
+
+                    <div class="alert alert-success text-center" role="alert">
+                        <h4 class="alert-heading"><i class="las la-trophy la-3x"></i></h4>
+                        <h4>¡Simulación completada con éxito!</h4>
+                        <hr>
+                        <p id="resultadoTexto" class="mb-0">Tus resultados han sido calculados. Revisa tu correo
+                            electrónico para más detalles.</p>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-primary" onclick="resetForm()">
+                            <i class="las la-redo-alt"></i> Realizar Nueva Simulación
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" id="contacto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <h5></h5>
+
+                    <img width="1500" height="229" src="https://uda.cl/wp-content/uploads/2024/09/acred-logocna.png"
+                        class="image wp-image-13408  attachment-full size-full" alt=""
+                        style="max-width: 100%; height: auto;" decoding="async" loading="lazy">
+
+                </div>
+                <div class="col-md-3">
+                    <h5>Acerca de Nosotros</h5>
+                    <p>Universidad de Atacama, la única casa de estudios superiores estatal de la región de Atacama.</p>
+
+                    <p>Cuenta con cuatro campus: Casa Central, Sede Vallenar, Campus Cordillera y Campus Medicina.</p>
+
+                    <p>Además de tutelar el Centro de desarrollo Cultural Caldera, Centro de Extensión Cultural Casa
+                        Maldini Tornini y el Palacete Villa Viña de Cristo.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contactos</h5>
+
+                    <div class="mb-3">
+                        <p><i class="las la-building"></i> <strong>Campus Central</strong><br>Copayapu #485<br><i
+                                class="las la-phone"></i> +56 52 2 255422</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p><i class="las la-hospital"></i> <strong>Campus Medicina</strong><br>Los Carrera #1579</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p><i class="las la-mountain"></i> <strong>Campus Cordillera</strong><br>Copayapu #2862</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <i class="las la-map-marked-alt"></i> <strong>Sede Vallenar</strong><br>Av. Costanera #105</p>
+                    </div>
+
+                </div>
+
+
+
+
+
+                <div class="col-md-3">
+                    <h5>Síguenos</h5>
+                    <div class="social-icons mb-3">
+                        <a href="https://www.facebook.com/admision.uda/"><i class="lab la-facebook"></i></a>
+                        <a href="https://www.instagram.com/admision.uda/"><i class="lab la-instagram"></i></a>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Universidad de Atacama. Todos los derechos reservados.</p>
+            </div>
+        </div>
+
+    </footer>
+
+    <!-- Modal Términos y Condiciones -->
+    <div class="modal fade" id="terminosModal" tabindex="-1" aria-labelledby="terminosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="terminosModalLabel">
+                        <i class="las la-file-contract"></i> Términos y Condiciones
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div><!-- en div modela header -->
+                <div class="modal-body">
+
+
+                    <h6>Aceptación de los Términos</h6>
+                    <div class="alert alert-info mb-2">
+                        Los datos de carácter personal que por este medio se entregan a la Universidad,
+                        serán tratados con la finalidad de mantener, desarrollar, controlar y ejecutar la
+                        relación existente entre las partes.
+                    </div>
+
+                    <p class="mb-3">UDA tratará los datos personales con el objeto de:</p>
+
+                    <ol class="list-group list-group-numbered mb-2">
+                        <li class="list-group-item border-0">
+                            Comunicarse con usted y mantenerlo(a) informado de cualquier novedad de la UDA u
+                            ofrecer nuevos servicios a futuro,
+                            ya sea que estos fueren prestados por la UDA o sus entidades relacionadas,
+                            sin perjuicio del derecho que tiene a solicitar que no se le remitan más
+                            comunicaciones electrónicas
+                            o telefónicas promocionales no deseadas, de conformidad a lo dispuesto en el
+                            Art. 28 B de la Ley 19.496.
+                        </li>
+                        <li class="list-group-item border-0">
+                            Realizar invitaciones, participación de iniciativas, actividades, concursos u
+                            otros.
+                        </li>
+                        <li class="list-group-item border-0">
+                            Realizar encuestas, estudios y estadísticas.
+                        </li>
+                    </ol>
+
+                    <p class="mb-4 fw-bold">Autoriza a la UDA para tratar sus datos de carácter personal de
+                        acuerdo
+                        con los objetivos enunciados en los literales anteriores.</p>
+
+                    <div class="bg-light p-3 mb-2 rounded">
+                        <p>La autorización indicada precedentemente puede ser revocada,
+                            aunque sin efecto retroactivo, lo que deberá hacerse mediante correo electrónico
+                            dirigido a
+                            <a href="mailto:cumplimiento@uda.cl" class="text-decoration-none">cumplimiento@uda.cl</a>
+                        </p>
+                    </div>
+
+                    <h5 class="mb-3">Confidencialidad de Datos:</h5>
+                    <p class="mb-3">UDA mantendrá el resguardo y la debida confidencialidad de los datos
+                        personales,
+                        no los transmitirá a terceros y no serán comercializados.
+                        Sin perjuicio de lo anterior, UDA estará facultado para compartir estos datos
+                        con:</p>
+
+                    <ul class="list-unstyled mb-2">
+                        <li class="mb-2">• Sus colaboradores y prestadores de servicios individualizados,
+                            a quienes se le facilitarán únicamente cuando sea estrictamente necesario para
+                            cumplir con las finalidades indicadas.
+                        </li>
+                        <li>• Cuando se deban entregar en razón de un mandato legal o de una orden emanada
+                            de los Tribunales de Justicia.
+                        </li>
+                    </ul>
+
+                    <div class="alert alert-warning">
+                        <p class="mb-0">El titular de los datos personales podrá en todo momento ejercer los
+                            derechos otorgados
+                            por la Ley Nº 19.628 y sus modificaciones posteriores.
+                            Para ejercer sus derechos el usuario podrá comunicarse con la UDA mediante el
+                            correo electrónico <a href="mailto:servicios@uda.cl"
+                                class="text-decoration-none">servicios@uda.cl</a>.</p>
+                    </div>
+
+                    <div class="text-end mt-2">
+                        <p class="text-muted">Muchas Gracias</p>
+                        <p class="text-muted mt-4"><small>Última actualización: Noviembre 2025</small></p>
+                    </div>
+
+
+
+                </div><!-- end div modal body -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        onclick="document.getElementById('terminos').checked = true;">Aceptar</button>
+                </div><!-- end dev modal footer -->
+
+
+            </div><!-- end div modal content-->
+        </div><!-- end div modal dialog -->
+    </div><!-- end div modal -->
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Navigation between sections
+        function nextSection(sectionNumber) {
+            // Validate current section before proceeding
+            const currentSection = document.querySelector('.form-section.active');
+            const inputs = currentSection.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                alert('Por favor, completa todos los campos obligatorios.');
+                return;
+            }
+
+            // Hide all sections
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show target section
+            document.getElementById('section' + sectionNumber).classList.add('active');
+
+            // Update step indicators
+            document.querySelectorAll('.step-item').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector('.step-item[data-step="' + sectionNumber + '"]').classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevSection(sectionNumber) {
+            nextSection(sectionNumber);
+        }
+
+        // Form submission
+        document.getElementById('simuladorForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Validate terms acceptance
+            if (!document.getElementById('terminos').checked) {
+                alert('Debes aceptar los términos y condiciones para continuar.');
+                return;
+            }
+
+            // Show results section
+            nextSection(3);
+
+            // You can add here the logic to calculate and display actual results
+            const nombre = document.getElementById('nombre').value;
+            const carrera = document.getElementById('carrera').options[document.getElementById('carrera').selectedIndex].text;
+
+            document.getElementById('resultadoTexto').innerHTML =
+                `<strong>${nombre}</strong>, has completado la simulación para <strong>${carrera}</strong>. <br>
+                Revisa tu correo electrónico <strong>${document.getElementById('email').value}</strong> para conocer los detalles de tu resultado.`;
+        });
+
+        function resetForm() {
+            document.getElementById('simuladorForm').reset();
+            nextSection(1);
+        }
+
+        // RUT formatting (optional enhancement)
+        document.getElementById('rut').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 8) {
+                value = value.slice(0, 8);
+            }
+            e.target.value = value;
+        });
+
+        // Smooth scrolling for navbar links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
