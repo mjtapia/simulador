@@ -60,15 +60,7 @@
             color: var(--secondary-color) !important;
         }
 
-        /* Banner/Jumbotron Styles 
-        .banner-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #4a6573 100%);
-            color: white;
-            padding: 80px 0;
-            margin-bottom: 50px;
-            position: relative;
-            overflow: hidden;
-        }*/
+        /* Banner/Jumbotron Styles */
 
         .banner-section {
             background: url("/images/bg-calendario.jpg") center/cover no-repeat;
@@ -468,16 +460,11 @@
                     <div class="mb-3">
                         <label for="carrera" class="form-label">Selecciona Carrera <span
                                 class="text-danger">*</span></label>
-                        <select class="form-select" id="carrera" required>
+                        <select class="form-select" id="carrera" required name="carrera">
                             <option value="">Selecciona una carrera</option>
-                            <option value="ingenieria-civil">Ingeniería Civil</option>
-                            <option value="medicina">Medicina</option>
-                            <option value="derecho">Derecho</option>
-                            <option value="psicologia">Psicología</option>
-                            <option value="arquitectura">Arquitectura</option>
-                            <option value="enfermeria">Enfermería</option>
-                            <option value="pedagogia">Pedagogía</option>
-                            <option value="contador-auditor">Contador Auditor</option>
+                            <option th:each="c : ${carreras}" th:value="${c[0]}" th:text="${c[1]}">
+                            </option>
+
                         </select>
                     </div>
 
@@ -616,10 +603,6 @@
                     </div>
 
                 </div>
-
-
-
-
 
                 <div class="col-md-3">
                     <h5>Síguenos</h5>
